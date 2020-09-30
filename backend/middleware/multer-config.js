@@ -5,7 +5,7 @@ const MIME_TYPES = {
   'image/jpeg': 'jpg',
   'image/png': 'png'
 };
-
+//on définit le dossier de destination, et on renomme le fichier
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
     callback(null, 'images');

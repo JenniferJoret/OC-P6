@@ -1,4 +1,4 @@
-const dotenv = require('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -7,6 +7,7 @@ const path = require('path');
 const saucesRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
 
+//Récupération des données de connexion à la BDD
 const nameDB = process.env.USER_DB;
 const passDB = process.env.PASS_DB;
 const baseDB = process.env.BASE_DB;
