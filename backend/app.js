@@ -1,3 +1,4 @@
+const dotenv = require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -6,7 +7,12 @@ const path = require('path');
 const saucesRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
 
-mongoose.connect('mongodb+srv://JenniferJoret:08nhS2ImMLTOsBPm@database.qavnu.gcp.mongodb.net/soPekocko?retryWrites=true&w=majority', {
+const nameDB = process.env.USER_DB;
+const passDB = process.env.PASS_DB;
+const baseDB = process.env.BASE_DB;
+
+// CONNEXION À LA BASE MONGODB
+mongoose.connect('mongodb+srv://' + nameDB + ':' + passDB + '@database.qavnu.gcp.mongodb.net/' + baseDB + '?retryWrites=true&w=majority', {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
@@ -15,6 +21,7 @@ mongoose.connect('mongodb+srv://JenniferJoret:08nhS2ImMLTOsBPm@database.qavnu.gc
 
 const app = express();
 
+// CORS
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');

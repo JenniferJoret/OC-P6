@@ -1,23 +1,28 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-var crypto = require('crypto');
+const crypto = require('crypto');
 
 // On définit notre algorithme de cryptage
-var algorithm = 'aes256';
+function mailCrypt(req) {
+    const algorithm = process.env.CIPHER_ALGORITHM;
+    const ckey = process.env.CIPHER_KEY;
+    const key = crypto.createHash('sha256').update(String(ckey)).digest('base64').substr(0, 32);
+    const iv = Buffer.alloc(16);
 
-var password = 'l5JmP+G0/1zB%;r8B8?2?2pcqGcL^3';
+    const cipher = crypto.createCipheriv(algorithm, key, iv);
+    let mailCrypted = cipher.update(req.body.email, 'utf8', 'hex');
+    mailCrypted += cipher.final('hex');
+    return mailCrypted;
+}
 
 const User = require('../models/user');
 
 //INSCRIPTION UTILISATEUR
 exports.signup = (req, res, next) => {
-
+    const mailCrypted = mailCrypt(req)
     bcrypt.hash(req.body.password, 10)
 
         .then(hash => {
-            var mailCrypted = mailCrypt(req);
-
-            console.log(mailCrypted);
 
             const user = new User({
                 email: mailCrypted,
@@ -38,8 +43,8 @@ exports.signup = (req, res, next) => {
 
 //CONNEXION UTILISATEUR
 exports.login = (req, res, next) => {
-    var mailCrypted = mailCrypt(req);
-
+    const mailCrypted = mailCrypt(req);
+    const tokenKey = process.env.TOKEN_KEY;
     User.findOne({
             email: mailCrypted
         })
@@ -61,7 +66,7 @@ exports.login = (req, res, next) => {
                         token: jwt.sign({
                                 userId: user._id
                             },
-                            '6*"n$bzJF~@O3Jfi#6[9POcWQuF^8%', {
+                            tokenKey, {
                                 expiresIn: '24h'
                             }
                         )
@@ -75,10 +80,3 @@ exports.login = (req, res, next) => {
             error
         }));
 };
-
-function mailCrypt(req) {
-    var cipher = crypto.createCipher(algorithm, password);
-    var mailCrypted = cipher.update(req.body.email, 'utf8', 'hex');
-    mailCrypted += cipher.final('hex');
-    return mailCrypted;
-}
