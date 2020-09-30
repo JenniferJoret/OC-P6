@@ -1,14 +1,26 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+var crypto = require('crypto');
+
+// On définit notre algorithme de cryptage
+var algorithm = 'aes256';
+
+var password = 'l5JmP+G0/1zB%;r8B8?2?2pcqGcL^3';
 
 const User = require('../models/user');
 
-
+//INSCRIPTION UTILISATEUR
 exports.signup = (req, res, next) => {
+
     bcrypt.hash(req.body.password, 10)
+
         .then(hash => {
+            var mailCrypted = mailCrypt(req);
+
+            console.log(mailCrypted);
+
             const user = new User({
-                email: req.body.email,
+                email: mailCrypted,
                 password: hash
             });
             user.save()
@@ -24,9 +36,12 @@ exports.signup = (req, res, next) => {
         }));
 };
 
+//CONNEXION UTILISATEUR
 exports.login = (req, res, next) => {
+    var mailCrypted = mailCrypt(req);
+
     User.findOne({
-            email: req.body.email
+            email: mailCrypted
         })
         .then(user => {
             if (!user) {
@@ -46,7 +61,7 @@ exports.login = (req, res, next) => {
                         token: jwt.sign({
                                 userId: user._id
                             },
-                            'RANDOM_TOKEN_SECRET', {
+                            '6*"n$bzJF~@O3Jfi#6[9POcWQuF^8%', {
                                 expiresIn: '24h'
                             }
                         )
@@ -60,3 +75,10 @@ exports.login = (req, res, next) => {
             error
         }));
 };
+
+function mailCrypt(req) {
+    var cipher = crypto.createCipher(algorithm, password);
+    var mailCrypted = cipher.update(req.body.email, 'utf8', 'hex');
+    mailCrypted += cipher.final('hex');
+    return mailCrypted;
+}

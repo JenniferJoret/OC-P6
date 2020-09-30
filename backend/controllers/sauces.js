@@ -1,6 +1,7 @@
 const Sauce = require('../models/sauce');
 const fs = require('fs');
 
+//CRÉER SAUCE
 exports.createSauce = (req, res, next) => {
     const sauceObject = JSON.parse(req.body.sauce);
     const sauce = new Sauce({
@@ -20,6 +21,7 @@ exports.createSauce = (req, res, next) => {
         }));
 };
 
+//RÉCUPÉRER UNE SAUCE
 exports.getOneSauce = (req, res, next) => {
     Sauce.findOne({
         _id: req.params.id
@@ -36,6 +38,7 @@ exports.getOneSauce = (req, res, next) => {
     );
 };
 
+//MODIFIER SAUCE
 exports.modifySauce = (req, res, next) => {
     const sauceObject = req.file ? {
         ...JSON.parse(req.body.sauce),
@@ -52,7 +55,6 @@ exports.modifySauce = (req, res, next) => {
                 fs.unlinkSync(`images/${filename}`);
             }
             updateSauce(req, sauceObject, res);
-
         })
         .catch(error => res.status(500).json({
             error
@@ -60,6 +62,7 @@ exports.modifySauce = (req, res, next) => {
 
 };
 
+//SUPPRIMER SAUCE
 exports.deleteSauce = (req, res, next) => {
     Sauce.findOne({
             _id: req.params.id
@@ -83,6 +86,7 @@ exports.deleteSauce = (req, res, next) => {
         }));
 };
 
+//RÉCUPÉRER TOUTES LES SAUCES
 exports.getAllSauces = (req, res, next) => {
     Sauce.find().then(
         (sauces) => {
@@ -97,7 +101,7 @@ exports.getAllSauces = (req, res, next) => {
     );
 };
 
-
+//GESTION DES LIKES DE SAUCES
 exports.likeSauce = (req, res, next) => {
     const userId = req.body.userId;
     const like = req.body.like;
@@ -140,6 +144,7 @@ exports.likeSauce = (req, res, next) => {
 
 };
 
+//METTRE LA SAUCE À JOUR
 function updateSauce(req, sauceObject, res) {
     Sauce.updateOne({
             _id: req.params.id
