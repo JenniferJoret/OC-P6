@@ -17,7 +17,7 @@ exports.createSauce = (req, res, next) => {
             message: 'Sauce enregistrée !'
         }))
         .catch(error => res.status(400).json({
-            error
+            error : error
         }));
 };
 
@@ -69,7 +69,7 @@ exports.deleteSauce = (req, res, next) => {
         })
         .then(sauce => {
             const filename = sauce.imageUrl.split('/images/')[1];
-            fs.unlink(`images/${filename}`, () => {
+                fs.unlinkSync(`images/${filename}`);
                 Sauce.deleteOne({
                         _id: req.params.id
                     })
@@ -79,7 +79,7 @@ exports.deleteSauce = (req, res, next) => {
                     .catch(error => res.status(400).json({
                         error
                     }));
-            });
+            ;
         })
         .catch(error => res.status(500).json({
             error
